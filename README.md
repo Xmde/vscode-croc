@@ -1,9 +1,9 @@
 # SendWithCroc
 
-A Visual Studio Code extension that adds a **Send with croc** command to the Explorer context menu.  
-Select one or more files, right-click ▶ **Send with croc**, and the extension will:
+A Visual Studio Code extension that adds a **Send with Croc** command to the Explorer context menu.  
+Select one or more files, right-click ▶ **Send with Croc**, and the extension will:
 
-1. Spawn `croc send` in an output channel  
+1. Spawn `croc send` in a terminal
 2. Auto-copy the relay code to your clipboard  
 3. Display transfer logs in real time  
 
@@ -63,7 +63,7 @@ code .
 ## Usage
 
 1. In the Explorer view, select one or more files or folders  
-2. Right-click ▶ **Send with croc**  
+2. Right-click ▶ **Send with Croc**  
 3. Watch the **croc** output channel for logs  
 4. Paste the relay code into the receiving machine’s croc prompt  
 
@@ -100,4 +100,4 @@ Please adhere to the existing code style and include tests for new functionality
 
 ## License
 
-MIT © Your Name
+MIT © Eric Verheyden
