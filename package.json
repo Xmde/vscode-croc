@@ -4,7 +4,11 @@
   "description": "Send files with croc",
   "publisher": "xmde",
   "version": "0.0.1",
-  "engines": { "vscode": "^1.50.0" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xmde/vscode-croc.git"
+  },
+  "engines": { "vscode": "^1.102.0" },
   "categories": [
     "Other"
   ],
