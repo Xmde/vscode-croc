@@ -1,7 +1,7 @@
 {
   "name": "vscode-croc",
   "displayName": "vscode-croc",
-  "description": "Send files with croc",
+  "description": "Send and receive files with croc - cross-platform file sharing made easy",
   "publisher": "xmde",
   "version": "0.0.1",
   "repository": {
@@ -13,7 +13,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscodeCroc.sendFiles"
+    "onCommand:vscodeCroc.sendFiles",
+    "onCommand:vscodeCroc.receiveFiles"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -21,6 +22,10 @@
       {
         "command": "vscodeCroc.sendFiles",
         "title": "Send with Croc"
+      },
+      {
+        "command": "vscodeCroc.receiveFiles",
+        "title": "Receive with Croc"
       }
     ],
     "menus": {
@@ -28,7 +33,12 @@
         {
           "command": "vscodeCroc.sendFiles",
           "when": "resourceScheme == 'file'",
-          "group": "7_modification"
+          "group": "5_cutcopypaste@99"
+        },
+        {
+          "command": "vscodeCroc.receiveFiles",
+          "when": "resourceScheme == 'file'",
+          "group": "5_cutcopypaste@100"
         }
       ]
     }

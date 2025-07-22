@@ -1,9 +1,11 @@
 // src/extension.ts
 import * as vscode from "vscode";
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import * as path from "path";
+import * as os from "os";
 
 export function activate(ctx: vscode.ExtensionContext) {
-  const cmd = vscode.commands.registerCommand(
+  const sendCmd = vscode.commands.registerCommand(
     "vscodeCroc.sendFiles",
     // note the two-arg signature
     (
@@ -62,7 +64,87 @@ export function activate(ctx: vscode.ExtensionContext) {
     }
   );
 
-  ctx.subscriptions.push(cmd);
+  const receiveCmd = vscode.commands.registerCommand(
+    "vscodeCroc.receiveFiles",
+    async (
+      contextSelection: vscode.Uri,
+      allSelections: vscode.Uri[]
+    ) => {
+      // Determine the target directory
+      let targetDir: string;
+      if (contextSelection) {
+        // If a file was right-clicked, use its containing directory
+        const stats = await vscode.workspace.fs.stat(contextSelection);
+        if (stats.type === vscode.FileType.File) {
+          targetDir = path.dirname(contextSelection.fsPath);
+        } else {
+          targetDir = contextSelection.fsPath;
+        }
+      } else {
+        // If no context, use the first workspace folder
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders || workspaceFolders.length === 0) {
+          return vscode.window.showErrorMessage(
+            "No workspace folder found. Please open a folder first."
+          );
+        }
+        targetDir = workspaceFolders[0].uri.fsPath;
+      }
+
+      // Check clipboard for croc code
+      let code: string | undefined = await vscode.env.clipboard.readText();
+      
+      // Validate if the clipboard content looks like a croc code
+      const crocCodePattern = /^[A-Za-z0-9\-]+$/;
+      if (!code || !crocCodePattern.test(code.trim())) {
+        // Prompt user for croc code
+        code = await vscode.window.showInputBox({
+          prompt: "Enter croc code to receive files",
+          placeHolder: "e.g., ABC123-def456",
+          validateInput: (input) => {
+            if (!input || !crocCodePattern.test(input.trim())) {
+              return "Please enter a valid croc code (alphanumeric with hyphens)";
+            }
+            return null;
+          }
+        });
+        
+        if (!code) {
+          return; // User cancelled
+        }
+      }
+
+      // Clean the code
+      code = code.trim();
+
+      // Create terminal and run croc receive
+      const term = vscode.window.createTerminal({
+        name: "ReceiveWithCroc",
+        cwd: targetDir
+      });
+      term.show(true);
+      
+      // Use platform-specific croc command format
+      const platform = os.platform();
+      let cmdLine: string;
+      
+      if (platform === 'win32') {
+        // Windows: croc <code>
+        cmdLine = `croc ${code}; exit`;
+      } else {
+        // Linux/macOS: CROC_SECRET=<code> croc
+        cmdLine = `CROC_SECRET=${code} croc; exit`;
+      }
+      
+      term.sendText(cmdLine, true);
+
+      vscode.window.showInformationMessage(
+        `📥 Receiving files with code: ${code}`
+      );
+    }
+  );
+
+  ctx.subscriptions.push(sendCmd, receiveCmd);
 }
 
 export function deactivate() {}
